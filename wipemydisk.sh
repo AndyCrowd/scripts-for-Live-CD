@@ -2,7 +2,9 @@
 #PathToDevice='/dev/sdX(Y)'
 PathToDevice="$1"
 RepeatWipes="0"
-
+#
+# TESTED ONLY IN ARCH LINUX
+#
 if [ ${PathToDevice}'XX' != 'XX'  ];then
 if [ -b ${PathToDevice} ];then
 
