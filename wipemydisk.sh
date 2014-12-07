@@ -17,8 +17,10 @@ echo The ${PathToDevice} Is partition of the': ' ${DeviceName}
 echo PhysicalBlockSize = ${PhysicalBlockSize} , PartStart = ${PartStart} \
 , PartSectors = ${PartSectors} , PartInByteSize = ${PartInByteSize}
 
-#openssl enc -aes-256-ctr -pass pass:"$(dd if=/dev/random bs=128 count=1 2>/dev/null | base64)" -nosalt </dev/zero \
-#| pv -bartpes ${PartInByteSize} | dd bs=${PhysicalBlockSize} count=${PartSectors} of=/dev/${DeviceName##*/} seek=${PartStart} oflag=direct iflag=nocache 
+#openssl enc -aes-256-ctr -pass pass:"$(dd if=/dev/random bs=128 count=1 2>/dev/null | \
+#base64)" -nosalt </dev/zero \
+#| pv -bartpes ${PartInByteSize} | dd bs=${PhysicalBlockSize} \ 
+#count=${PartSectors} of=/dev/${DeviceName##*/} seek=${PartStart} oflag=direct iflag=nocache 
 
 #dd if=/dev/zero bs=${PhysicalBlockSize} count=${PartSectors} |
 #pv -bartpes ${PartInByteSize} | 
