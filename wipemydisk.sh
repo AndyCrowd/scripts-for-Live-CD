@@ -3,6 +3,7 @@
 PathToDevice="$1"
 RepeatWipes="0"
 
+if [ ${PathToDevice}'XX' != 'XX'  ];then
 if [ -b ${PathToDevice} ];then
 
 for (( count=0; count<=${RepeatWipes}; count++ ));do
@@ -53,5 +54,7 @@ fi;
 done;
 #To verify 
 #hexdump "${PathToDevice}"
-else echo Is not a block'/'storage device'!'
+else echo 'Is not a block/storage device!'
+fi;
+else echo 'No block device is specified! Use something like /dev/sdX(Y)'
 fi;
