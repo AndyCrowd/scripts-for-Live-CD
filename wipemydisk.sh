@@ -12,7 +12,7 @@ DeviceName=$(echo ${PathToDevice} | sed 's/[0-9$]//m')
 #UseBlockSize=$(cat /sys/block/${DeviceName##*/}/queue/physical_block_size)
 UseBlockSize=$(cat /sys/block/${DeviceName##*/}/queue/logical_block_size)
 if [[ "${PathToDevice}" =~ $CC ]];then
-
+PartAlignmentOffset=$(cat /sys/block/sdb/sdb1/alignment_offset)
 PartStart=$(cat /sys/block/${DeviceName##*/}/${PathToDevice##*/}/start)
 PartSectors=$(cat /sys/block/${DeviceName##*/}/${PathToDevice##*/}/size)
 PartInByteSize=$((UseBlockSize * PartSectors))
@@ -23,12 +23,13 @@ echo UseBlockSize = ${UseBlockSize} , PartStart = ${PartStart} \
 
 #openssl enc -aes-256-ctr -pass pass:"$(dd if=/dev/random bs=128 count=1 2>/dev/null | base64)" -nosalt </dev/zero \
 #| pv -bartpes ${PartInByteSize} |
-#dd bs=${UseBlockSize} count=${PartSectors} of=/dev/${DeviceName##*/} seek=${PartStart} oflag=direct iflag=nocache 
+#dd bs=${UseBlockSize} count=${PartSectors} of=/dev/${DeviceName##*/} \ 
+#seek=$((PartStart + PartAlignmentOffset)) oflag=direct iflag=nocache 
 
 #dd if=/dev/urandom |
 #pv -bartpes ${PartInByteSize} |
 #dd of=/dev/${DeviceName##*/} bs=${UseBlockSize} count=${PartSectors} \
-#seek=${PartStart} oflag=direct iflag=nocache
+#seek=$((PartStart + PartAlignmentOffset)) oflag=direct iflag=nocache
 
 #dd if=/dev/zero |
 #pv -bartpes ${PartInByteSize} | 
