@@ -57,4 +57,6 @@ done;
 else echo 'Is not a block/storage device!'
 fi;
 else echo 'No block device is specified! Use something like /dev/sdX(Y)'
+lsblk -o SIZE,NAME,FSTYPE,MODEL
+echo chose one from above to destroy
 fi;
