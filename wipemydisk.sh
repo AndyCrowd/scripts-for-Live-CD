@@ -62,12 +62,6 @@ echo UsePhysBlockSize = ${UsePhysBlockSize} , DevicePhysSectors = ${DevicePhysSe
 #dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UseLogicBlockSize}
 
 #
-# Use Physical Block Size
-#
-#dd if=/dev/zero bs=${UsePhysBlockSize} count=${DevicePhysSectors} | pv -bartpes ${DeviceInByteSize} |
-#dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UsePhysBlockSize}
-
-#
 # Use Physical Block Size & compressed randomized data.
 # High CPU usage but might be good to use on SSD. 
 #
@@ -75,9 +69,15 @@ echo UsePhysBlockSize = ${UsePhysBlockSize} , DevicePhysSectors = ${DevicePhysSe
 #| gzip | bzip2 | xz -9 --format=raw | pv -bartpes ${DeviceInByteSize} \ 
 #| dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UsePhysBlockSize}
 
+#
+# Use Physical Block Size & zeros
+#
+#dd if=/dev/zero bs=${UsePhysBlockSize} count=${DevicePhysSectors} | pv -bartpes ${DeviceInByteSize} |
+#dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UsePhysBlockSize}
+
 fi;
 done;
-#To verify 
+#To verify after filled in disk with zeros
 #hexdump "${PathToDevice}"
 else echo 'Is not a block/storage device!'
 fi;
