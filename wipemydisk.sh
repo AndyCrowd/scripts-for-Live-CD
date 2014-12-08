@@ -29,14 +29,14 @@ echo UseBlockSize = ${UseBlockSize} , PartStart = ${PartStart} \
 #dd bs=${UseBlockSize} count=${PartSectors} of=/dev/${DeviceName##*/} \ 
 #seek=$((PartStart + PartAlignmentOffset)) oflag=direct iflag=nocache 
 
-#dd if=/dev/urandom |
+#dd if=/dev/urandom bs=${UseBlockSize} count=${PartSectors} |
 #pv -bartpes ${PartInByteSize} |
-#dd of=/dev/${DeviceName##*/} bs=${UseBlockSize} count=${PartSectors} \
+#dd of=/dev/${DeviceName##*/} bs=${UseBlockSize} \
 #seek=$((PartStart + PartAlignmentOffset)) oflag=direct iflag=nocache
 
-#dd if=/dev/zero |
+#dd if=/dev/zero bs=${UseBlockSize} count=${PartSectors} |
 #pv -bartpes ${PartInByteSize} | 
-#dd of=/dev/${DeviceName##*/} bs=${UseBlockSize} count=${PartSectors} \ 
+#dd of=/dev/${DeviceName##*/} bs=${UseBlockSize} \ 
 #seek=${PartStart} oflag=direct iflag=nocache
 
 else echo The ${PathToDevice} is a device'!';
