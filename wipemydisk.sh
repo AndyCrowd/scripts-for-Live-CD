@@ -12,45 +12,68 @@ for (( count=0; count<=${RepeatWipes}; count++ ));do
 
 CC='[0-9]+$';
 DeviceName=$(echo ${PathToDevice} | sed 's/[0-9$]//m')
-#UseBlockSize=$(cat /sys/block/${DeviceName##*/}/queue/physical_block_size)
-UseBlockSize=$(cat /sys/block/${DeviceName##*/}/queue/logical_block_size)
+UsePhysBlockSize=$(cat /sys/block/${DeviceName##*/}/queue/physical_block_size)
+UseLogicBlockSize=$(cat /sys/block/${DeviceName##*/}/queue/logical_block_size)
 if [[ "${PathToDevice}" =~ $CC ]];then
 PartAlignmentOffset=$(cat /sys/block/${DeviceName##*/}/${PathToDevice##*/}/alignment_offset)
 PartStart=$(cat /sys/block/${DeviceName##*/}/${PathToDevice##*/}/start)
 PartSectors=$(cat /sys/block/${DeviceName##*/}/${PathToDevice##*/}/size)
-PartInByteSize=$((UseBlockSize * PartSectors))
+PartInByteSize=$((UseLogicBlockSize * PartSectors))
 
 echo The ${PathToDevice} Is partition of the': ' ${DeviceName} 
-echo UseBlockSize = ${UseBlockSize} , PartStart = ${PartStart} \
+echo UseLogicBlockSize = ${UseLogicBlockSize} , PartStart = ${PartStart} \
 , PartSectors = ${PartSectors} , PartInByteSize = ${PartInByteSize}
 
 #openssl enc -aes-256-ctr -pass pass:"$(dd if=/dev/random bs=128 count=1 2>/dev/null | base64)" -nosalt </dev/zero \
 #| pv -bartpes ${PartInByteSize} |
-#dd bs=${UseBlockSize} count=${PartSectors} of=/dev/${DeviceName##*/} \ 
+#dd bs=${UseLogicBlockSize} count=${PartSectors} of=/dev/${DeviceName##*/} \ 
 #seek=$((PartStart + PartAlignmentOffset)) oflag=direct iflag=nocache 
 
-#dd if=/dev/urandom bs=${UseBlockSize} count=${PartSectors} |
+#dd if=/dev/urandom bs=${UseLogicBlockSize} count=${PartSectors} |
 #pv -bartpes ${PartInByteSize} |
-#dd of=/dev/${DeviceName##*/} bs=${UseBlockSize} \
+#dd of=/dev/${DeviceName##*/} bs=${UseLogicBlockSize} \
 #seek=$((PartStart + PartAlignmentOffset)) oflag=direct iflag=nocache
 
-#dd if=/dev/zero bs=${UseBlockSize} count=${PartSectors} |
+#dd if=/dev/zero bs=${UseLogicBlockSize} count=${PartSectors} |
 #pv -bartpes ${PartInByteSize} | 
-#dd of=/dev/${DeviceName##*/} bs=${UseBlockSize} \ 
+#dd of=/dev/${DeviceName##*/} bs=${UseLogicBlockSize} \ 
 #seek=${PartStart} oflag=direct iflag=nocache
 
 else echo The ${PathToDevice} is a device'!';
 
 partprobe ${PathToDevice}
 
-DeviceSectors=$(cat /sys/block/${DeviceName##*/}/size)
-DeviceInByteSize=$((UseBlockSize * DeviceSectors))
-echo UseBlockSize = ${UseBlockSize} , DeviceSectors = ${DeviceSectors} \
+DeviceLogicSectors=$(cat /sys/block/${DeviceName##*/}/size)
+DeviceInByteSize=$((UseLogicBlockSize * DeviceLogicSectors))
+DevicePhysSectors=$((DeviceInByteSize / UsePhysBlockSize))
+
+echo UseLogicBlockSize = ${UseLogicBlockSize} , DeviceLogicSectors = ${DeviceLogicSectors} \
+, DeviceInByteSize = ${DeviceInByteSize}
+
+echo UsePhysBlockSize = ${UsePhysBlockSize} , DevicePhysSectors = ${DevicePhysSectors} \
 , DeviceInByteSize = ${DeviceInByteSize}
 
 #wipefs -a ${PathToDevice}
-#dd if=/dev/zero bs=${UseBlockSize} count=${DeviceSectors} | pv -bartpes ${DeviceInByteSize} | 
-#dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache 
+
+#
+# Use Logical Block Size
+#
+#dd if=/dev/zero bs=${UseLogicBlockSize} count=${DeviceLogicSectors} | pv -bartpes ${DeviceInByteSize} | 
+#dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UseLogicBlockSize}
+
+#
+# Use Physical Block Size
+#
+#dd if=/dev/zero bs=${UsePhysBlockSize} count=${DevicePhysSectors} | pv -bartpes ${DeviceInByteSize} |
+#dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UsePhysBlockSize}
+
+#
+# Use Physical Block Size & compressed randomized data.
+# High CPU usage but might be good to use on SSD. 
+#
+#dd if=/dev/urandom bs=${UsePhysBlockSize} count=${DevicePhysSectors} \
+#| gzip | bzip2 | xz -9 --format=raw | pv -bartpes ${DeviceInByteSize} \ 
+#| dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UsePhysBlockSize}
 
 fi;
 done;
