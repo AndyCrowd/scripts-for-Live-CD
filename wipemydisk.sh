@@ -66,15 +66,26 @@ echo UsePhysBlockSize = ${UsePhysBlockSize} , DevicePhysSectors = ${DevicePhysSe
 # Use Physical Block Size & compressed randomized data.
 # High CPU usage but might be good to use on SSD. 
 #
-#dd if=/dev/urandom bs=${UsePhysBlockSize} count=${DevicePhysSectors} \
+#dd if=/dev/urandom bs=${UsePhysBlockSize} \
 #| gzip | bzip2 | xz -9 --format=raw | pv -bartpes ${DeviceInByteSize} \ 
-#| dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UsePhysBlockSize}
+#| dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UsePhysBlockSize} \
+#count=${DevicePhysSectors}
+
+#
+# Use Physical Block Size & compressed AES-ssl data.
+# High CPU usage but might be good to use on SSD. 
+#
+#openssl enc -aes-256-ctr -pass pass:"$(dd if=/dev/random bs=128 \
+#count=1 2>/dev/null | base64)" -nosalt </dev/zero | xz -9 --format=raw | pv -bartpes ${DeviceInByteSize} \ 
+#| dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UsePhysBlockSize} \ 
+#count=${DevicePhysSectors}
 
 #
 # Use Physical Block Size & zeros
 #
-#dd if=/dev/zero bs=${UsePhysBlockSize} count=${DevicePhysSectors} | pv -bartpes ${DeviceInByteSize} |
-#dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UsePhysBlockSize}
+#dd if=/dev/zero bs=${UsePhysBlockSize} | pv -bartpes ${DeviceInByteSize} |
+#dd of=/dev/${DeviceName##*/} seek=0 oflag=direct iflag=nocache bs=${UsePhysBlockSize} \ 
+#count=${DevicePhysSectors}
 
 fi;
 done;
