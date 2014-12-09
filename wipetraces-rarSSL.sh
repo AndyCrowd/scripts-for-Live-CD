@@ -2,7 +2,7 @@
 
 #
 # Creates rar with random password, file names, size, split name
-# It removes files when carshes due disk full error and removes all created files
+# It removes files when crashes due disk full error or you killed it and removes all created files
 #
 openssl enc -aes-256-ctr -pass pass:"$(dd if=/dev/random bs=128 \
 count=1 2>/dev/null | base64)" -nosalt </dev/zero | pv | 
