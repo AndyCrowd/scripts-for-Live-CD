@@ -9,6 +9,6 @@
 ####
 
 openssl enc -aes-256-ctr -pass pass:"$(dd if=/dev/random bs=128 \
-count=1 2>/dev/null | base64)" -nosalt </dev/zero \
-| 7z a -si -t7z -v${RANDOM}m -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on \
+count=1 2>/dev/null | base64)" -nosalt </dev/zero | pv |
+7z a -si -t7z -v${RANDOM}m -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on \ 
 -p${RANDOM}"$(dd if=/dev/urandom bs=512 count=1)" test.wipe.${RANDOM}.file
