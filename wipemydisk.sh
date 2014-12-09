@@ -5,6 +5,11 @@ RepeatWipes="0"
 #
 # TESTED ONLY IN ARCH LINUX
 #
+
+# Use on:
+# Partition = Logical sectors only
+# Disk = Physical sectors or Logical sectors
+
 if [ "${PathToDevice}"'XX' != 'XX'  ];then
 if [ -b ${PathToDevice} ];then
 
