@@ -47,7 +47,7 @@ echo Starting at:
 date
 
 for (( count=0; count<=${RepeatWipes}; count++ ));do
-echo Destroying with enabled patterns has begun !!!
+echo "The single partition wipe - round: ${RepeatWipes}"
 
 #openssl enc -aes-256-ctr -pass pass:"$(dd if=/dev/random bs=128 count=1 2>/dev/null | base64)" -nosalt </dev/zero \
 #| pv -bartpes ${PartInByteSize} |
@@ -100,7 +100,7 @@ echo Starting at:
 date
 
 for (( count=0; count<=${RepeatWipes}; count++ ));do
-echo Wiping of the disk with enabled patterns is started
+echo "The whole devce wipe - round: ${RepeatWipes}"
 #wipefs -a ${PathToDevice}
 
 #
