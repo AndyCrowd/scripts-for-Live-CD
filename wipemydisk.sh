@@ -1,4 +1,8 @@
 #/bin/bash
+#
+#Patterns in this script are based on info from other forums everything else is under
+#License: GPL
+#
 #PathToDevice='/dev/sdX(Y)'
 PathToDevice="$1"
 RepeatWipes="0"
@@ -28,9 +32,11 @@ PartStart=$(cat /sys/block/${DeviceName##*/}/${PathToDevice##*/}/start)
 PartSectors=$(cat /sys/block/${DeviceName##*/}/${PathToDevice##*/}/size)
 PartInByteSize=$((UseLogicBlockSize * PartSectors))
 
-echo The ${PathToDevice} Is partition of the': ' ${DeviceName} 
-echo UseLogicBlockSize = ${UseLogicBlockSize} , PartStart = ${PartStart} \
-, PartSectors = ${PartSectors} , PartInByteSize = ${PartInByteSize}
+echo "The ${PathToDevice} Is partition of the: ${DeviceName} 
+UseLogicBlockSize = ${UseLogicBlockSize}
+PartStart = ${PartStart} 
+PartSectors = ${PartSectors}  
+PartInByteSize = ${PartInByteSize}"
 
 if [ "$ASK_confirm" == "1"  ];then
 read -r -p "Continue to run patterns to Destroy PARTITION /dev/${PathToDevice##*/}? [y/N] " answer
@@ -71,7 +77,7 @@ date
 
 fi
 
-else echo The ${PathToDevice} is a device'!';
+else 
 
 partprobe ${PathToDevice}
 
@@ -79,11 +85,14 @@ DeviceLogicSectors=$(cat /sys/block/${DeviceName##*/}/size)
 DeviceInByteSize=$((UseLogicBlockSize * DeviceLogicSectors))
 DevicePhysSectors=$((DeviceInByteSize / UsePhysBlockSize))
 
-echo UseLogicBlockSize = ${UseLogicBlockSize} , DeviceLogicSectors = ${DeviceLogicSectors} \
-, DeviceInByteSize = ${DeviceInByteSize}
-
-echo UsePhysBlockSize = ${UsePhysBlockSize} , DevicePhysSectors = ${DevicePhysSectors} \
-, DeviceInByteSize = ${DeviceInByteSize}
+echo "The ${PathToDevice} is a device'!'
+UseLogicBlockSize = ${UseLogicBlockSize}
+DeviceLogicSectors = ${DeviceLogicSectors}
+DeviceInByteSize = ${DeviceInByteSize}
+_
+UsePhysBlockSize = ${UsePhysBlockSize}
+DevicePhysSectors = ${DevicePhysSectors}
+DeviceInByteSize = ${DeviceInByteSize}"
 
 if [ "$ASK_confirm" == "1"  ];then
 read -r -p "Continue to run patterns to WIPE DEVICE /dev/${DeviceName##*/}? [y/N] " answer
