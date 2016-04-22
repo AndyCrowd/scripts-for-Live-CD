@@ -1,13 +1,20 @@
 #/bin/bash
 #
-#Patterns in this script are based on info from other forums everything else is under
-#License: GPL
+#Script: License: GPL
+#Patterns: are from forums and wiki
 #
+#Author: Andy Crowd
 #PathToDevice='/dev/sdX(Y)'
 PathToDevice="$1"
 RepeatWipes="0"
 ASK_confirm="1"
-
+echo 'You must edit the script:
+ 1) Uncomment or add own wiping patterns.
+ 2) Adjust settings in variables:
+   RepeatWipes="0"
+   ASK_confirm="1"'
+   echo 'Press any key to continue!'
+keywait
 #
 # TESTED ONLY IN ARCH LINUX
 #
@@ -18,9 +25,8 @@ ASK_confirm="1"
 
 DeviceName=$(echo ${PathToDevice} | sed 's/[0-9$]//m')
 
-if [ "${PathToDevice}"'XX' != 'XX'  ];then
+if [ ! -z "${PathToDevice}"  ];then
 if [ -b "${DeviceName}" ] ;then
-
 CC='[0-9]+$';
 
 UsePhysBlockSize=$(cat /sys/block/${DeviceName##*/}/queue/physical_block_size)
@@ -37,6 +43,14 @@ UseLogicBlockSize = ${UseLogicBlockSize}
 PartStart = ${PartStart} 
 PartSectors = ${PartSectors}  
 PartInByteSize = ${PartInByteSize}"
+
+ISMounted=$(lsblk /dev/${PathToDevice##*/}  -o "NAME,MOUNTPOINT" | grep /)
+if [[ ! -z "$ISMounted"  ]]:then
+echo '!!! Not allowed to wipe mounted partition! Unmount and try again:'
+echo "$ISMounted"
+echo 'Unmount and try again!'
+exit 1
+fi
 
 if [ "$ASK_confirm" == "1"  ];then
 read -r -p "Continue to run patterns to Destroy PARTITION /dev/${PathToDevice##*/}? [y/N] " answer
@@ -93,6 +107,14 @@ _
 UsePhysBlockSize = ${UsePhysBlockSize}
 DevicePhysSectors = ${DevicePhysSectors}
 DeviceInByteSize = ${DeviceInByteSize}"
+
+ISMounted=$(lsblk /dev/${PathToDevice##*/}  -o "NAME,MOUNTPOINT" | grep /)
+if [[ ! -z "$ISMounted"  ]]:then
+echo '!!! Not allowed to wipe! At least one partition is mounted:'
+echo "$ISMounted"
+echo 'Unmount and try again!'
+exit 1
+fi
 
 if [ "$ASK_confirm" == "1"  ];then
 read -r -p "Continue to run patterns to WIPE DEVICE /dev/${DeviceName##*/}? [y/N] " answer
