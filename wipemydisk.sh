@@ -23,7 +23,7 @@ keywait
 # Partition = Logical sectors only
 # Disk = Physical sectors or Logical sectors
 
-DeviceName="$(echo ${PathToDevice} | sed 's/[0-9$]//m')"
+DeviceName="${PathToDevice/[0-9$]/}"
 
 if [ ! -z "${PathToDevice}"  ];then
 if [ -b "${DeviceName}" ] ;then
@@ -66,7 +66,7 @@ if [ ${ASK_confirm} == "0"  ];then
 echo Starting at:
 date
 
-for (( count=0; count<=${RepeatWipes}; count++ ));do
+for (( count=0; count<=RepeatWipes; count++ ));do
 echo "The single partition wipe - round: ${RepeatWipes}"
 
 #openssl enc -aes-256-ctr -pass pass:"$(dd if=/dev/random bs=128 count=1 2>/dev/null | base64)" -nosalt </dev/zero \
@@ -95,7 +95,7 @@ else
 
 partprobe "${PathToDevice}"
 
-DeviceLogicSectors=$(cat /sys/block/${DeviceName##*/}/size)
+DeviceLogicSectors=$(cat /sys/block/"${DeviceName##*/}"/size)
 DeviceInByteSize=$((UseLogicBlockSize * DeviceLogicSectors))
 DevicePhysSectors=$((DeviceInByteSize / UsePhysBlockSize))
 
@@ -130,7 +130,7 @@ if [ ${ASK_confirm} == "0"  ];then
 echo Starting at:
 date
 
-for (( count=0; count<=${RepeatWipes}; count++ ));do
+for (( count=0; count<=RepeatWipes; count++ ));do
 echo "The whole devce wipe - round: ${RepeatWipes}"
 #wipefs -a ${PathToDevice}
 
