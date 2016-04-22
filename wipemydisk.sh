@@ -23,19 +23,19 @@ keywait
 # Partition = Logical sectors only
 # Disk = Physical sectors or Logical sectors
 
-DeviceName=$(echo ${PathToDevice} | sed 's/[0-9$]//m')
+DeviceName="$(echo ${PathToDevice} | sed 's/[0-9$]//m')"
 
 if [ ! -z "${PathToDevice}"  ];then
 if [ -b "${DeviceName}" ] ;then
 CC='[0-9]+$';
 
-UsePhysBlockSize=$(cat /sys/block/${DeviceName##*/}/queue/physical_block_size)
-UseLogicBlockSize=$(cat /sys/block/${DeviceName##*/}/queue/logical_block_size)
+UsePhysBlockSize=$(cat /sys/block/"${DeviceName##*/}"/queue/physical_block_size)
+UseLogicBlockSize=$(cat /sys/block/"${DeviceName##*/}"/queue/logical_block_size)
 if [[ "${PathToDevice}" =~ $CC ]];then
 #PartAlignmentOffset=$(cat /sys/block/${DeviceName##*/}/${PathToDevice##*/}/alignment_offset)
 #PartAlignmentOffset=0
-PartStart=$(cat /sys/block/${DeviceName##*/}/${PathToDevice##*/}/start)
-PartSectors=$(cat /sys/block/${DeviceName##*/}/${PathToDevice##*/}/size)
+PartStart=$(cat /sys/block/"${DeviceName##*/}/${PathToDevice##*/}"/start)
+PartSectors=$(cat /sys/block/"${DeviceName##*/}/${PathToDevice##*/}"/size)
 PartInByteSize=$((UseLogicBlockSize * PartSectors))
 
 echo "The ${PathToDevice} Is partition of the: ${DeviceName} 
@@ -44,7 +44,7 @@ PartStart = ${PartStart}
 PartSectors = ${PartSectors}  
 PartInByteSize = ${PartInByteSize}"
 
-ISMounted=$(lsblk /dev/${PathToDevice##*/}  -o "NAME,MOUNTPOINT" | grep /)
+ISMounted="$(lsblk /dev/${PathToDevice##*/} -o "NAME,MOUNTPOINT" | grep /)"
 if [[ ! -z "$ISMounted"  ]];then
 echo '!!! Not allowed to wipe mounted partition! Unmount and try again:'
 echo "$ISMounted"
@@ -93,7 +93,7 @@ fi
 
 else 
 
-partprobe ${PathToDevice}
+partprobe "${PathToDevice}"
 
 DeviceLogicSectors=$(cat /sys/block/${DeviceName##*/}/size)
 DeviceInByteSize=$((UseLogicBlockSize * DeviceLogicSectors))
@@ -108,7 +108,7 @@ UsePhysBlockSize = ${UsePhysBlockSize}
 DevicePhysSectors = ${DevicePhysSectors}
 DeviceInByteSize = ${DeviceInByteSize}"
 
-ISMounted=$(lsblk /dev/${PathToDevice##*/}  -o "NAME,MOUNTPOINT" | grep /)
+ISMounted="$(lsblk /dev/${PathToDevice##*/}  -o "NAME,MOUNTPOINT" | grep /)"
 if [[ ! -z "$ISMounted"  ]];then
 echo '!!! Not allowed to wipe! At least one partition is mounted:'
 echo "$ISMounted"
