@@ -45,7 +45,7 @@ PartSectors = ${PartSectors}
 PartInByteSize = ${PartInByteSize}"
 
 ISMounted=$(lsblk /dev/${PathToDevice##*/}  -o "NAME,MOUNTPOINT" | grep /)
-if [[ ! -z "$ISMounted"  ]]:then
+if [[ ! -z "$ISMounted"  ]];then
 echo '!!! Not allowed to wipe mounted partition! Unmount and try again:'
 echo "$ISMounted"
 echo 'Unmount and try again!'
@@ -109,7 +109,7 @@ DevicePhysSectors = ${DevicePhysSectors}
 DeviceInByteSize = ${DeviceInByteSize}"
 
 ISMounted=$(lsblk /dev/${PathToDevice##*/}  -o "NAME,MOUNTPOINT" | grep /)
-if [[ ! -z "$ISMounted"  ]]:then
+if [[ ! -z "$ISMounted"  ]];then
 echo '!!! Not allowed to wipe! At least one partition is mounted:'
 echo "$ISMounted"
 echo 'Unmount and try again!'
